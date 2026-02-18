@@ -1,0 +1,38 @@
+<!--index.html-->
+<!DOCTYPE html>
+<html>
+<body>
+  <h1>Orion Hub</h1>
+  <button onclick="select()">Select Folder</button>
+  <p id="path"></p>
+  <script>
+    async function select() {
+      const path = await window.api.selectOrionRoot();
+      document.getElementById('path').textContent = path;
+    }
+
+    (async () => {
+      const path = await window.api.getOrionRoot();
+      if(path){
+         document.getElementById('path').textContent = 
+              'Current Orion Root: ' + path;
+      }
+    })();
+  </script>
+  <h2>Available Engine Versions</h2>
+  <ul id="versions"></ul>
+
+  <script>
+    window.addEventListener('DDMContextLoaded', async () => {
+      const versions = await window.api.getEngineVersions();
+      const ul = document.getElementById('versions');
+
+      versions.forEach(v => {
+        const li = document.createElement('li');
+        li.textContent = `${v.tag} (${v.publishedAt})`;
+        ul.appendChild(li);
+      });
+    });
+  </script>
+</body>
+</html>
