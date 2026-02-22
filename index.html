@@ -23,16 +23,25 @@
   <ul id="versions"></ul>
 
   <script>
-    window.addEventListener('DDMContextLoaded', async () => {
+  document.addEventListener('DOMContentLoaded', async () => {
+    try {
       const versions = await window.api.getEngineVersions();
       const ul = document.getElementById('versions');
 
-      versions.forEach(v => {
-        const li = document.createElement('li');
-        li.textContent = `${v.tag} (${v.publishedAt})`;
-        ul.appendChild(li);
-      });
-    });
-  </script>
+      if(versions.length === 0){
+        ul.textContent = 'No releases found';
+      } else {
+        versions.forEach(v => {
+          const li = document.createElement('li');
+          li.textContent = `${v.tag} (${v.publishedAt})`;
+          ul.appendChild(li);
+        });
+      }
+    } catch (e) {
+      document.getElementById('versions').textContent = 'Failed to load versions';
+      console.error(e);
+    }
+  });
+</script>
 </body>
 </html>

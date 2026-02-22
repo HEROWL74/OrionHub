@@ -80,7 +80,6 @@ function createWindow() {
   });
 
   win.loadFile('index.html');
-  win.webContents.openDevTools();
 }
 
 app.whenReady().then(createWindow);
@@ -108,12 +107,19 @@ ipcMain.handle('get-orion-root', () => {
   return config?.orionRoot ?? null;
 })
 
-ipcMain.handle('get-engine-versions', async() => {
+ipcMain.handle('get-engine-versions', async () => {
   const releases = await fetchReleases();
 
-  return releases.map(r => ({
-    tag: r.tag_name,
-    name: r.name,
-    publishedAt: r.published_at
-  }));
+  return releases
+    .filter(r =>
+      !r.draft &&
+      !r.prerelease &&
+      typeof r.tag_name === 'string' &&
+      r.tag_name.startsWith('v')
+    )
+    .map(r => ({
+      tag: r.tag_name,
+      name: r.name ?? '',
+      publishedAt: r.published_at
+    }));
 });
