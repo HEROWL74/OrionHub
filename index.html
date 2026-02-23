@@ -20,28 +20,81 @@
     })();
   </script>
   <h2>Available Engine Versions</h2>
-  <ul id="versions"></ul>
+  <div id="versions" class="version-list"></div>
 
   <script>
-  document.addEventListener('DOMContentLoaded', async () => {
-    try {
-      const versions = await window.api.getEngineVersions();
-      const ul = document.getElementById('versions');
+ document.addEventListener('DOMContentLoaded', async () => {
+  const versions = await window.api.getEngineVersions();
+  const container = document.getElementById('versions');
 
-      if(versions.length === 0){
-        ul.textContent = 'No releases found';
-      } else {
-        versions.forEach(v => {
-          const li = document.createElement('li');
-          li.textContent = `${v.tag} (${v.publishedAt})`;
-          ul.appendChild(li);
-        });
-      }
-    } catch (e) {
-      document.getElementById('versions').textContent = 'Failed to load versions';
-      console.error(e);
-    }
+  if (versions.length === 0) {
+    container.textContent = 'No stable engine versions found.';
+    return;
+  }
+
+  versions.forEach(v => {
+    const card = document.createElement('div');
+    card.className = 'version-card';
+
+    const tag = document.createElement('div');
+    tag.className = 'version-tag';
+    tag.textContent = v.tag;
+
+    const date = document.createElement('div');
+    date.className = 'version-date';
+    date.textContent = new Date(v.publishedAt).toLocaleDateString();
+
+    card.appendChild(tag);
+    card.appendChild(date);
+
+    container.appendChild(card);
   });
+});
 </script>
+<style>
+  body {
+    font-family: system-ui, sans-serif;
+    background: #0f1115;
+    color: #e6e6e6;
+  }
+
+  h1, h2 {
+    color: #ffffff;
+  }
+
+  .version-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 12px;
+    margin-top: 12px;
+  }
+
+  .version-card {
+    background: #1a1d24;
+    border: 1px solid #2a2f3a;
+    border-radius: 8px;
+    padding: 12px;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .version-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+    border-color: #3a82f6;
+  }
+
+  .version-tag {
+    font-size: 16px;
+    font-weight: 600;
+    color: #3a82f6;
+  }
+
+  .version-date {
+    font-size: 12px;
+    color: #9aa0aa;
+    margin-top: 4px;
+  }
+</style>
 </body>
 </html>
