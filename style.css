@@ -1,0 +1,62 @@
+/* style.css */
+body {
+    font-family: system-ui, -apple-system, sans-serif;
+    background: #0f1115;
+    color: #e6e6e6;
+    margin: 20px;
+}
+
+h1, h2 { color: #ffffff; border-bottom: 1px solid #2a2f3a; padding-bottom: 8px; }
+
+.version-list, .project-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.version-card, .project-card {
+    background: #1a1d24;
+    border: 1px solid #2a2f3a;
+    border-radius: 8px;
+    padding: 16px;
+    cursor: pointer;
+    transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.version-card:hover, .project-card:hover {
+    transform: translateY(-2px);
+    border-color: #3a82f6;
+    background: #23272e;
+}
+
+.version-tag { font-size: 16px; font-weight: 600; color: #3a82f6; }
+.version-date { font-size: 12px; color: #9aa0aa; margin-top: 4px; }
+.installed { opacity: 0.7; cursor: default; border-style: dashed; }
+
+.project-create {
+    margin: 20px 0;
+    display: flex;
+    gap: 8px;
+    background: #1a1d24;
+    padding: 16px;
+    border-radius: 8px;
+}
+
+input, select, button {
+    padding: 8px 12px;
+    background: #0f1115;
+    border: 1px solid #2a2f3a;
+    color: #e6e6e6;
+    border-radius: 4px;
+}
+
+button {
+    background: #3a82f6;
+    color: white;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:hover { opacity: 0.9; }
