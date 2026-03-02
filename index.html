@@ -22,6 +22,21 @@
   <h2>Available Engine Versions</h2>
   <div id="versions" class="version-list"></div>
 
+  <h2>Create New Project</h2>
+
+  <div class="project-create">
+    <input id="project-name" placeholder="Project Name" />
+
+    <select id="engineSelect">
+      <option value="">Select Engine Version</option>
+    </select>
+
+    <button id="createBtn">Create Project</button>
+  </div>
+
+  <h2>Your Projects</h2>
+  <div id="projectList" class="project-list"></div>
+
   <script>
  document.addEventListener('DOMContentLoaded', async () => {
   const versions = await window.api.getEngineVersions();
@@ -44,11 +59,101 @@
     date.className = 'version-date';
     date.textContent = new Date(v.publishedAt).toLocaleDateString();
 
+    const engineSelect = document.getElementById('engineSelect');
+    const option = document.createElement('option');
+    option.value = v.tag;
+    option.textContent = v.tag;
+    engineSelect.appendChild(option);
+
     card.appendChild(tag);
     card.appendChild(date);
 
+     if (v.installed) {
+       card.classList.add('installed'); // CSSで見た目を変えるためにクラス追加
+       tag.textContent = v.tag + " (Installed)";
+       card.style.opacity = "0.7";
+       card.style.cursor = "default";
+     }
+
+    card.addEventListener('click', async () => {
+      if(v.installed) return;
+      if(!v.zipUrl){
+        alert('No zip fond for this version');
+        return;
+      }
+
+      card.textContent = "Downloading...";
+
+      const result = await window.api.installEngine(v);
+
+      if(result.success)
+      {
+          card.textContent = v.tag + '(Installed)';
+      }else{
+        card.textContent = 'Failed';
+      }
+    })
+
     container.appendChild(card);
   });
+
+  const projectList = document.getElementById('projectList');
+  const projects = await window.api.getProjects();
+
+  projects.forEach(p => {
+    const card = document.createElement('div');
+    card.className = 'project-card';
+
+    const name = document.createElement('div');
+    name.textContent = p.name;
+    name.style.fontWeight = '600';
+
+    const version = document.createElement('div');
+    version.textContent = p.engineVersion;
+    version.style.fontSize = '12px';
+    version.style.color = '#9aa0aa';
+
+    card.appendChild(name);
+    card.appendChild(version);
+
+    card.addEventListener('click', async () => {
+      const result = await window.api.openProject(p.name);
+      if (!result.success) {
+        alert(result.error);
+       }
+  });
+
+  projectList.appendChild(card);
+});
+
+});
+
+document.getElementById('createBtn').addEventListener('click', async () => {
+
+  const projectName = document.getElementById('project-name').value.trim();
+  const engineTag = document.getElementById('engineSelect').value;
+
+  if (!projectName) {
+    alert("Enter project name");
+    return;
+  }
+
+  if (!engineTag) {
+    alert("Select engine version");
+    return;
+  }
+
+  const result = await window.api.createProject({
+    projectName,
+    engineTag
+  });
+
+  if (result.success) {
+    alert("Project created!");
+    await window.api.openProject(projectName);
+  } else {
+    alert(result.error || "Failed");
+  }
 });
 </script>
 <style>
@@ -95,6 +200,56 @@
     color: #9aa0aa;
     margin-top: 4px;
   }
+
+  .project-create {
+  margin-top: 16px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.project-create input,
+.project-create select {
+  padding: 6px;
+  background: #1a1d24;
+  border: 1px solid #2a2f3a;
+  color: #e6e6e6;
+  border-radius: 4px;
+}
+
+.project-create button {
+  padding: 6px 12px;
+  background: #3a82f6;
+  border: none;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.project-create button:hover {
+  opacity: 0.85;
+}
+.project-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.project-card {
+  background: #1a1d24;
+  border: 1px solid #2a2f3a;
+  border-radius: 8px;
+  padding: 12px;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.project-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+  border-color: #3a82f6;
+}
 </style>
 </body>
 </html>
