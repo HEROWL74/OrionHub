@@ -72,6 +72,15 @@ async function initEngineVersions() {
 
         container.appendChild(card);
     });
+
+    const installedVersions = versions.filter(v => v.installed);
+    if(installedVersions.length > 0)
+    {
+        const latest = installedVersions[0];
+        engineSelect.value = latest.tag;
+        
+        document.getElementById('engineHint').textContent = `Using Engine ${latest.tag}`;
+    }
 }
 
 // --- イベント登録 ---
@@ -128,6 +137,15 @@ window.addEventListener('focus', updateProjectList);
 
 // 初回ロード
 document.addEventListener('DOMContentLoaded', async () => {
+
+    const engineSelect = document.getElementById('engineSelect');
+
+    engineSelect.addEventListener('change', () => {
+          const tag = engineSelect.value;
+          document.getElementById('engineHint').textContent = 
+             tag ? `Using Engine ${tag}` : '';
+    });
+    
     const path = await window.api.getOrionRoot();
     if(path) document.getElementById('path').textContent = 'Current Orion Root: ' + path;
     
